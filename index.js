@@ -71,6 +71,40 @@ app.get("/comics/:characterId", async (req,res) => {
     }
 });
 
+app.get("/character/:characterId", async (req,res) => {
+    try {
+        const response = await axios.get(
+            `https://lereacteur-marvel-api.herokuapp.com/character/${req.params.characterId}?apiKey=${process.env.MARVEL_API_KEY}`
+        );
+        res.json(response.data);
+    } catch (error) {
+        res.status(400).json({message: error.message});
+    }
+});
+
+app.post("/favorites-characters", async (req,res) => {
+    
+    if (req.body.favorites){
+    const chars = req.body.favorites;
+    const result =[];
+    
+    for(let i=0; i<chars.length; i++){
+        try {
+            const response = await axios.get(
+                `https://lereacteur-marvel-api.herokuapp.com/character/${chars[i]}?apiKey=${process.env.MARVEL_API_KEY}`
+            );
+            result.push(response.data);
+            
+        } catch (error) {
+            res.status(400).json({message: error.message});
+        }
+    };
+    res.json(result);} else {
+        res.status(400).json({message: "missing parameter"});
+    }
+    
+});
+
 app.all("*", (req, res) => {
     res.status(404).json({ message: "Page not found"});
 });
